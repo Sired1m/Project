@@ -26,7 +26,9 @@ def create_meds_record(dataframe,medication_name, active_ingredients, dosage_fre
                         "active_ingredients":[list_to_string(active_ingredients)],
                         "dosage_frequency_in_hours":[dosage_frequency_in_hours],
                         "Usage_and_Safety_Instructions":[Usage_and_Safety_Instructions],
-                        "Urgency":[Urgency], "category":[category], "quantity_on_hand":[quantity_on_hand],
+                        "Urgency":[Urgency],
+                        "category":[category],
+                        "quantity_on_hand":[quantity_on_hand],
                         "expiration_date":[expiration_date],
                         "compliance_rating":[compliance_rating],
                         "pills_per_dose":[pills_per_dose],
@@ -68,12 +70,13 @@ def set_new_intake_time(dosage_frequency_in_hours):
 
 def load_meds():
     df = pd.read_csv("meds.csv")
-    df["next_intake_time"] = pd.to_datetime(df["next_intake_time"])
+    df["next_intake_time"] = pd.to_datetime(df["next_intake_time"], format="mixed")
+    df["expiration_date"] = pd.to_datetime(df["expiration_date"], format="mixed")
     return df
 
 def load_intake_log():
     df=pd.read_csv("intake_log.csv")
-    df["intake_time"] = pd.to_datetime(df["intake_time"])
+    df["intake_time"] = pd.to_datetime(df["intake_time"], format="mixed")
     return df
 
 def calculate_quantity_needed(ppd, d):
@@ -85,6 +88,7 @@ def create_intake_record(medsdf, med_id):
         return None 
 
     current_qty = medsdf.loc[mask, "quantity_on_hand"].iloc[0]
+    current_needed_qty = medsdf.loc[mask, "quantity_needed"].iloc[0]
     dose_size = medsdf.loc[mask, "pills_per_dose"].iloc[0]
 
     if current_qty < dose_size:
@@ -93,6 +97,7 @@ def create_intake_record(medsdf, med_id):
     rdf = pd.DataFrame({"med_id":[med_id], "intake_time":[datetime.datetime.now()]})
     dosage_frequency = medsdf.loc[mask, "dosage_frequency_in_hours"].iloc[0]
     medsdf.loc[mask, "quantity_on_hand"] = current_qty - dose_size
+    medsdf.loc[mask, "quantity_needed"] = current_needed_qty - dose_size
     medsdf.loc[mask, "next_intake_time"] = set_new_intake_time(dosage_frequency)
     save_meds(medsdf)
     return rdf
@@ -108,7 +113,7 @@ def calculate_end_date(start, nday):
 def schedule_builder(dataframe):
     now =  datetime.datetime.now()
     the_24h = now + datetime.timedelta(hours=24)
-    return dataframe[(dataframe["next_intake_time"] >= now) & (dataframe["next_intake_time"] <= the_24h) ].sort_values(by='next_intake_time', ignore_index=True)
+    return dataframe[(dataframe["next_intake_time"] >= now) & (dataframe["next_intake_time"] <= the_24h) & (dataframe["quantity_on_hand"] >= dataframe["pills_per_dose"])].sort_values(by='next_intake_time', ignore_index=True)
 
 def list_not_taken_meds(dataframe):
     return dataframe[dataframe["next_intake_time"] < datetime.datetime.now()].sort_values(by='next_intake_time', ignore_index=True)
@@ -126,4 +131,23 @@ def set_compliance_rating(dataframe,id, rate):
     return True
 
 def sort_by_compliance_rating(dataframe):
-    return dataframe.sort_values(by='compliance_rating', ignore_index=True)
+    return dataframe.sort_values(by='compliance_rating',ascending=False, ignore_index=True)
+
+def list_meds_need_refill(dataframe,ldataframe):
+    already_listed_ids = ldataframe["med_id"]
+    df = dataframe[dataframe["quantity_on_hand"] < dataframe["quantity_needed"]]
+    df = df[~df["med_id"].isin(already_listed_ids)]
+    return df
+
+def add_to_refill_request_list(dataframe,dr):
+    df = pd.concat([dataframe, dr], ignore_index=True)
+    return df
+
+def create_expiered_soon_meds_list(dataframe):
+    now = datetime.datetime.now()
+    time = now + datetime.timedelta(days=30)
+    return dataframe[(dataframe["expiration_date"] >= now) & (dataframe["expiration_date"] <= time)]
+
+def list_expiered_list(dataframe):
+    now = datetime.datetime.now()
+    return dataframe[dataframe["expiration_date"] < now]
