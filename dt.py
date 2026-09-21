@@ -3,6 +3,10 @@ Generates fresh meds.csv and intake_log.csv for testing, with all timestamps
 computed relative to the moment this script is run - so nothing goes "stale"
 no matter when you actually test.
 
+Covers both filters:
+  schedule_builder:     next_intake_time >= now - 30min, <= now + 24h, stock >= pills_per_dose
+  list_not_taken_meds:  next_intake_time + 30min < now
+
 Run this right before opening the Streamlit app:
     python generate_test_data.py
 """
@@ -18,68 +22,63 @@ def t(**kwargs):
     return now + datetime.timedelta(**kwargs)
 
 
+def med(med_id, name, ingredients, freq, next_time, on_hand, per_dose=1,
+        urgency="Medium", category="OTC", expiry="2027-03-15",
+        instructions="Take with food", days=10, rating=3):
+    """Builds one row with the full column set so every test case stays short."""
+    return {
+        "med_id": med_id, "medication_name": name, "active_ingredients": ingredients,
+        "dosage_frequency_in_hours": freq, "Usage_and_Safety_Instructions": instructions,
+        "Urgency": urgency, "category": category, "quantity_on_hand": on_hand,
+        "expiration_date": expiry, "compliance_rating": rating, "pills_per_dose": per_dose,
+        "days": days, "next_intake_time": next_time, "quantity_needed": days,
+        "start_date": t(days=-5), "end_date": t(days=days - 5),
+    }
+
+
 rows = [
-    # --- Ready to log RIGHT NOW (within the 30-min grace window) ---
-    {"med_id": 1, "medication_name": "Tylenol", "active_ingredients": "Acetaminophen",
-     "dosage_frequency_in_hours": 6, "Usage_and_Safety_Instructions": "Take with food",
-     "Urgency": "Medium", "category": "OTC", "quantity_on_hand": 20,
-     "expiration_date": "2027-03-15", "compliance_rating": 4, "pills_per_dose": 1, "days": 10,
-     "next_intake_time": t(minutes=5), "quantity_needed": 10,
-     "start_date": t(days=-5), "end_date": t(days=5)},
+    # --- SCHEDULE: due soon or inside the 30-min grace window ---
+    med(1, "Tylenol", "Acetaminophen", 6, t(minutes=5), 20, rating=4),
+    med(2, "Ibuprofen", "Ibuprofen", 8, t(minutes=-10), 15, expiry="2026-09-25", rating=2),
+    med(3, "Vitamin D", "Cholecalciferol", 24, t(minutes=-29), 30, category="Supplement"),  # edge: just inside grace
 
-    {"med_id": 2, "medication_name": "Ibuprofen", "active_ingredients": "Ibuprofen",
-     "dosage_frequency_in_hours": 8, "Usage_and_Safety_Instructions": "Take with food",
-     "Urgency": "Medium", "category": "OTC", "quantity_on_hand": 15,
-     "expiration_date": "2026-09-25", "compliance_rating": 2, "pills_per_dose": 1, "days": 7,
-     "next_intake_time": t(minutes=-10), "quantity_needed": 7,   # already due, still within grace
-     "start_date": t(days=-3), "end_date": t(days=4)},
+    # --- SCHEDULE: later today, within 24h ---
+    med(4, "NyQuil", "Acetaminophen, Dextromethorphan", 8, t(hours=3), 8, per_dose=2,
+        instructions="Avoid alcohol", expiry="2026-10-05"),
+    med(5, "Amoxicillin", "Amoxicillin", 8, t(hours=6), 6, urgency="High",
+        category="Prescription", instructions="Complete full course", expiry="2026-11-20", rating=4),
+    med(6, "Loratadine", "Loratadine", 24, t(hours=23), 12),           # edge: just inside 24h
+    med(7, "Multivitamin", "Mixed vitamins", 12, t(hours=2), 2, per_dose=2,
+        category="Supplement"),                                        # stock exactly equals dose
 
-    # --- Too early to log (outside the grace window) ---
-    {"med_id": 3, "medication_name": "NyQuil", "active_ingredients": "Acetaminophen, Dextromethorphan",
-     "dosage_frequency_in_hours": 8, "Usage_and_Safety_Instructions": "Avoid alcohol",
-     "Urgency": "Medium", "category": "OTC", "quantity_on_hand": 8,
-     "expiration_date": "2026-10-05", "compliance_rating": 3, "pills_per_dose": 2, "days": 5,
-     "next_intake_time": t(hours=3), "quantity_needed": 10,
-     "start_date": t(days=-2), "end_date": t(days=3)},
+    # --- MISSED: more than 30 min overdue ---
+    med(8, "Cetirizine", "Cetirizine", 24, t(minutes=-31), 10),        # edge: just past grace
+    med(9, "Lisinopril", "Lisinopril", 24, t(hours=-5), 10, urgency="High",
+        category="Prescription", instructions="Take same time daily",
+        expiry="2027-06-01", days=30, rating=5),
+    med(10, "Omeprazole", "Omeprazole", 24, t(hours=-2), 0,
+        category="Prescription", instructions="Take before breakfast"),  # missed AND out of stock
 
-    {"med_id": 4, "medication_name": "Amoxicillin", "active_ingredients": "Amoxicillin",
-     "dosage_frequency_in_hours": 8, "Usage_and_Safety_Instructions": "Complete full course",
-     "Urgency": "High", "category": "Prescription", "quantity_on_hand": 6,
-     "expiration_date": "2026-11-20", "compliance_rating": 4, "pills_per_dose": 1, "days": 10,
-     "next_intake_time": t(hours=6), "quantity_needed": 10,
-     "start_date": t(days=-3), "end_date": t(days=7)},
+    # --- NEITHER: outside the 24h window ---
+    med(11, "Zinc", "Zinc sulfate", 24, t(hours=26), 40, category="Supplement"),  # beyond 24h
 
-    # --- Overdue / missed (already past due, won't show on the schedule) ---
-    {"med_id": 5, "medication_name": "Lisinopril", "active_ingredients": "Lisinopril",
-     "dosage_frequency_in_hours": 24, "Usage_and_Safety_Instructions": "Take same time daily",
-     "Urgency": "High", "category": "Prescription", "quantity_on_hand": 10,
-     "expiration_date": "2027-06-01", "compliance_rating": 5, "pills_per_dose": 1, "days": 30,
-     "next_intake_time": t(hours=-5), "quantity_needed": 30,
-     "start_date": t(days=-30), "end_date": t(hours=-5)},
-
-    # --- Zero on hand (should fail with "not enough on hand", not "too early") ---
-    {"med_id": 6, "medication_name": "Aspirin", "active_ingredients": "Aspirin",
-     "dosage_frequency_in_hours": 6, "Usage_and_Safety_Instructions": "Take with food",
-     "Urgency": "Medium", "category": "OTC", "quantity_on_hand": 0,
-     "expiration_date": "2026-10-10", "compliance_rating": 3, "pills_per_dose": 1, "days": 15,
-     "next_intake_time": t(minutes=2), "quantity_needed": 15,
-     "start_date": t(days=-5), "end_date": t(days=10)},
+    # --- NEITHER: not enough on hand (hidden from schedule, not overdue) ---
+    med(12, "Aspirin", "Aspirin", 6, t(minutes=2), 0, days=15, rating=3),         # 0 on hand
+    med(13, "Codeine Syrup", "Codeine", 8, t(hours=1), 1, per_dose=2,
+        category="Prescription"),                                                 # 1 on hand, needs 2
 
     # --- As-needed / no fixed schedule (frequency = 0) ---
-    {"med_id": 7, "medication_name": "Band-Aid Antiseptic", "active_ingredients": "Benzalkonium Chloride",
-     "dosage_frequency_in_hours": 0, "Usage_and_Safety_Instructions": "Apply to clean wound as needed",
-     "Urgency": "Low", "category": "First Aid", "quantity_on_hand": 25,
-     "expiration_date": "2027-08-10", "compliance_rating": 5, "pills_per_dose": 1, "days": 1,
-     "next_intake_time": t(hours=1), "quantity_needed": 1,
-     "start_date": now, "end_date": t(days=1)},
+    med(14, "Band-Aid Antiseptic", "Benzalkonium Chloride", 0, t(hours=1), 25,
+        urgency="Low", category="First Aid", instructions="Apply to clean wound as needed",
+        expiry="2027-08-10", days=1, rating=5),
 
     # --- Already expired ---
-    {"med_id": 8, "medication_name": "Old Cough Syrup", "active_ingredients": "Dextromethorphan",
-     "dosage_frequency_in_hours": 8, "Usage_and_Safety_Instructions": "Take every 8 hours as needed",
-     "Urgency": "Low", "category": "OTC", "quantity_on_hand": 4,
-     "expiration_date": "2025-05-01", "compliance_rating": 3, "pills_per_dose": 1, "days": 5,
-     "next_intake_time": t(hours=2), "quantity_needed": 5,
-     "start_date": t(days=-500), "end_date": t(days=-495)},
+    med(15, "Old Cough Syrup", "Dextromethorphan", 8, t(hours=2), 4,
+        urgency="Low", instructions="Take every 8 hours as needed",
+        expiry="2025-05-01", days=5),
+
+    # --- Duplicate name, different id (tests med_id-based lookups) ---
+    med(16, "Tylenol", "Acetaminophen", 6, t(hours=8), 20, rating=4),
 ]
 
 df = pd.DataFrame(rows)
@@ -87,14 +86,12 @@ df.to_csv("meds.csv", index=False)
 
 intake_rows = [
     {"med_id": 1, "intake_time": t(days=-1)},
-    {"med_id": 5, "intake_time": t(days=-2)},
+    {"med_id": 9, "intake_time": t(days=-2)},
 ]
 pd.DataFrame(intake_rows).to_csv("intake_log.csv", index=False)
 
 print("Done. Generated relative to:", now.strftime("%Y-%m-%d %H:%M:%S"))
-print("- Tylenol (1) and Ibuprofen (2): loggable now")
-print("- NyQuil (3) and Amoxicillin (4): too early")
-print("- Lisinopril (5): overdue, off the 24h schedule")
-print("- Aspirin (6): loggable-timing but 0 on hand")
-print("- Band-Aid (7): as-needed, frequency 0")
-print("- Old Cough Syrup (8): expired")
+print("- Schedule (expect 1,2,3,4,5,6,7,16): due now, inside grace, or within 24h with stock")
+print("- Missed (expect 8,9,10): more than 30 min overdue (10 is also out of stock)")
+print("- Neither: 11 (beyond 24h), 12 and 13 (not enough stock), 14 (as-needed), 15 (expired)")
+print("Note: 14 and 15 only stay out if your code filters on frequency 0 / expiry - otherwise they show up in the schedule.")

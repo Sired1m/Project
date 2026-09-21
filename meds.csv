@@ -1,9 +1,17 @@
 med_id,medication_name,active_ingredients,dosage_frequency_in_hours,Usage_and_Safety_Instructions,Urgency,category,quantity_on_hand,expiration_date,compliance_rating,pills_per_dose,days,next_intake_time,quantity_needed,start_date,end_date
-1,Tylenol,Acetaminophen,6,Take with food,Medium,OTC,19,2027-03-15,4,1,10,2026-09-21 04:35:41.050651,9,2026-09-15 22:35:20.269381,2026-09-25 22:35:20.269381
-2,Ibuprofen,Ibuprofen,8,Take with food,Medium,OTC,15,2026-09-25,2,1,7,2026-09-20 22:25:20.269381,7,2026-09-17 22:35:20.269381,2026-09-24 22:35:20.269381
-3,NyQuil,"Acetaminophen, Dextromethorphan",8,Avoid alcohol,Medium,OTC,8,2026-10-05,3,2,5,2026-09-21 01:35:20.269381,10,2026-09-18 22:35:20.269381,2026-09-23 22:35:20.269381
-4,Amoxicillin,Amoxicillin,8,Complete full course,High,Prescription,6,2026-11-20,4,1,10,2026-09-21 04:35:20.269381,10,2026-09-17 22:35:20.269381,2026-09-27 22:35:20.269381
-5,Lisinopril,Lisinopril,24,Take same time daily,High,Prescription,10,2027-06-01,5,1,30,2026-09-20 17:35:20.269381,30,2026-08-21 22:35:20.269381,2026-09-20 17:35:20.269381
-6,Aspirin,Aspirin,6,Take with food,Medium,OTC,0,2026-10-10,3,1,15,2026-09-20 22:37:20.269381,15,2026-09-15 22:35:20.269381,2026-09-30 22:35:20.269381
-7,Band-Aid Antiseptic,Benzalkonium Chloride,0,Apply to clean wound as needed,Low,First Aid,25,2027-08-10,5,1,1,2026-09-20 23:35:20.269381,1,2026-09-20 22:35:20.269381,2026-09-21 22:35:20.269381
-8,Old Cough Syrup,Dextromethorphan,8,Take every 8 hours as needed,Low,OTC,4,2025-05-01,3,1,5,2026-09-21 00:35:20.269381,5,2025-05-08 22:35:20.269381,2025-05-13 22:35:20.269381
+1,Tylenol,Acetaminophen,6,Take with food,Medium,OTC,20,2027-03-15,4,1,10,2026-09-21 16:13:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+2,Ibuprofen,Ibuprofen,8,Take with food,Medium,OTC,15,2026-09-25,2,1,10,2026-09-21 15:58:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+3,Vitamin D,Cholecalciferol,24,Take with food,Medium,Supplement,30,2027-03-15,3,1,10,2026-09-21 15:39:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+4,NyQuil,"Acetaminophen, Dextromethorphan",8,Avoid alcohol,Medium,OTC,8,2026-10-05,3,2,10,2026-09-21 19:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+5,Amoxicillin,Amoxicillin,8,Complete full course,High,Prescription,6,2026-11-20,4,1,10,2026-09-21 22:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+6,Loratadine,Loratadine,24,Take with food,Medium,OTC,12,2027-03-15,3,1,10,2026-09-22 15:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+7,Multivitamin,Mixed vitamins,12,Take with food,Medium,Supplement,2,2027-03-15,3,2,10,2026-09-21 18:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+8,Cetirizine,Cetirizine,24,Take with food,Medium,OTC,10,2027-03-15,3,1,10,2026-09-21 15:37:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+9,Lisinopril,Lisinopril,24,Take same time daily,High,Prescription,10,2027-06-01,5,1,30,2026-09-21 11:08:35.852787,30,2026-09-16 16:08:35.852787,2026-10-16 16:08:35.852787
+10,Omeprazole,Omeprazole,24,Take before breakfast,Medium,Prescription,0,2027-03-15,3,1,10,2026-09-21 14:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+11,Zinc,Zinc sulfate,24,Take with food,Medium,Supplement,40,2027-03-15,3,1,10,2026-09-22 18:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+12,Aspirin,Aspirin,6,Take with food,Medium,OTC,0,2027-03-15,3,1,15,2026-09-21 16:10:35.852787,15,2026-09-16 16:08:35.852787,2026-10-01 16:08:35.852787
+13,Codeine Syrup,Codeine,8,Take with food,Medium,Prescription,1,2027-03-15,3,2,10,2026-09-21 17:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787
+14,Band-Aid Antiseptic,Benzalkonium Chloride,0,Apply to clean wound as needed,Low,First Aid,25,2027-08-10,5,1,1,2026-09-21 17:08:35.852787,1,2026-09-16 16:08:35.852787,2026-09-17 16:08:35.852787
+15,Old Cough Syrup,Dextromethorphan,8,Take every 8 hours as needed,Low,OTC,4,2025-05-01,3,1,5,2026-09-21 18:08:35.852787,5,2026-09-16 16:08:35.852787,2026-09-21 16:08:35.852787
+16,Tylenol,Acetaminophen,6,Take with food,Medium,OTC,20,2027-03-15,4,1,10,2026-09-22 00:08:35.852787,10,2026-09-16 16:08:35.852787,2026-09-26 16:08:35.852787

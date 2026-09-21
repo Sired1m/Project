@@ -121,10 +121,10 @@ def calculate_end_date(start, nday):
 def schedule_builder(dataframe):
     now =  datetime.datetime.now()
     the_24h = now + datetime.timedelta(hours=24)
-    return dataframe[(dataframe["next_intake_time"] >= now) & (dataframe["next_intake_time"] <= the_24h) & (dataframe["quantity_on_hand"] >= dataframe["pills_per_dose"])].sort_values(by='next_intake_time', ignore_index=True)
+    return dataframe[(dataframe["next_intake_time"]  >= now - datetime.timedelta(minutes=30) )  & (dataframe["next_intake_time"] <= the_24h) & (dataframe["quantity_on_hand"] >= dataframe["pills_per_dose"])].sort_values(by='next_intake_time', ignore_index=True)
 
 def list_not_taken_meds(dataframe):
-    return dataframe[dataframe["next_intake_time"] < datetime.datetime.now()].sort_values(by='next_intake_time', ignore_index=True)
+    return dataframe[dataframe["next_intake_time"] + datetime.timedelta(minutes=30) < datetime.datetime.now()].sort_values(by='next_intake_time', ignore_index=True)
 
 def load_health_tips():
     return pd.read_csv("health_tips.csv")
@@ -159,3 +159,7 @@ def create_expiered_soon_meds_list(dataframe):
 def list_expiered_list(dataframe):
     now = datetime.datetime.now()
     return dataframe[dataframe["expiration_date"] < now]
+
+def exclude_expired_list(dataframe):
+    now = pd.Timestamp.today().normalize()
+    return dataframe[pd.to_datetime(dataframe["expiration_date"], errors="coerce") >= now]
