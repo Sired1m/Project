@@ -1,6 +1,9 @@
 med_id,medication_name,active_ingredients,dosage_frequency_in_hours,Usage_and_Safety_Instructions,Urgency,category,quantity_on_hand,expiration_date,compliance_rating,pills_per_dose,days,next_intake_time,quantity_needed,start_date,end_date
-1,Tylenol,Acetaminophen,6,Take with food,Medium,OTC,20,2027-03-15,4,1,10,2026-09-20 14:00:00,10,2026-09-10 08:00:00,2026-09-20 08:00:00
-2,NyQuil,"Acetaminophen, Dextromethorphan",8,Avoid alcohol drowsiness warning,Medium,OTC,8,2026-10-05,3,2,5,2026-09-20 22:00:00,10,2026-09-15 20:00:00,2026-09-20 20:00:00
-3,Lisinopril,Lisinopril,24,Take same time daily monitor blood pressure,High,Prescription,3,2027-06-01,5,1,30,2026-09-19 09:00:00,30,2026-08-21 09:00:00,2026-09-20 09:00:00
-4,Vitamin D3,Cholecalciferol,24,Take with fatty meal for absorption,Low,Supplement,45,2028-01-01,5,1,60,2026-09-20 20:00:00,60,2026-07-22 08:00:00,2026-09-20 08:00:00
-5,Ibuprofen,Ibuprofen,8,Take with food avoid on empty stomach,Medium,OTC,15,2026-09-25,2,1,7,2026-09-18
+1,Tylenol,Acetaminophen,6,Take with food,Medium,OTC,19,2027-03-15,4,1,10,2026-09-21 04:35:41.050651,9,2026-09-15 22:35:20.269381,2026-09-25 22:35:20.269381
+2,Ibuprofen,Ibuprofen,8,Take with food,Medium,OTC,15,2026-09-25,2,1,7,2026-09-20 22:25:20.269381,7,2026-09-17 22:35:20.269381,2026-09-24 22:35:20.269381
+3,NyQuil,"Acetaminophen, Dextromethorphan",8,Avoid alcohol,Medium,OTC,8,2026-10-05,3,2,5,2026-09-21 01:35:20.269381,10,2026-09-18 22:35:20.269381,2026-09-23 22:35:20.269381
+4,Amoxicillin,Amoxicillin,8,Complete full course,High,Prescription,6,2026-11-20,4,1,10,2026-09-21 04:35:20.269381,10,2026-09-17 22:35:20.269381,2026-09-27 22:35:20.269381
+5,Lisinopril,Lisinopril,24,Take same time daily,High,Prescription,10,2027-06-01,5,1,30,2026-09-20 17:35:20.269381,30,2026-08-21 22:35:20.269381,2026-09-20 17:35:20.269381
+6,Aspirin,Aspirin,6,Take with food,Medium,OTC,0,2026-10-10,3,1,15,2026-09-20 22:37:20.269381,15,2026-09-15 22:35:20.269381,2026-09-30 22:35:20.269381
+7,Band-Aid Antiseptic,Benzalkonium Chloride,0,Apply to clean wound as needed,Low,First Aid,25,2027-08-10,5,1,1,2026-09-20 23:35:20.269381,1,2026-09-20 22:35:20.269381,2026-09-21 22:35:20.269381
+8,Old Cough Syrup,Dextromethorphan,8,Take every 8 hours as needed,Low,OTC,4,2025-05-01,3,1,5,2026-09-21 00:35:20.269381,5,2025-05-08 22:35:20.269381,2025-05-13 22:35:20.269381

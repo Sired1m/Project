@@ -82,25 +82,33 @@ def load_intake_log():
 def calculate_quantity_needed(ppd, d):
     return ppd * d
 
+EARLY_LOGGING_GRACE_MINUTES = 30
+
 def create_intake_record(medsdf, med_id):
     mask = medsdf["med_id"] == med_id
     if mask.sum() == 0:
-        return None 
+        return None, "Medication not found."
+
+    next_due = medsdf.loc[mask, "next_intake_time"].iloc[0]
+    earliest_allowed = next_due - datetime.timedelta(minutes=EARLY_LOGGING_GRACE_MINUTES)
+    now = datetime.datetime.now()
+    if now < earliest_allowed:
+        return None, f"Too early — next dose isn't due until {next_due.strftime('%Y-%m-%d %H:%M:%S')}."
 
     current_qty = medsdf.loc[mask, "quantity_on_hand"].iloc[0]
     current_needed_qty = medsdf.loc[mask, "quantity_needed"].iloc[0]
     dose_size = medsdf.loc[mask, "pills_per_dose"].iloc[0]
 
     if current_qty < dose_size:
-        return None
-    
+        return None, "Not enough medication on hand to log this dose."
+
     rdf = pd.DataFrame({"med_id":[med_id], "intake_time":[datetime.datetime.now()]})
-    dosage_frequency = medsdf.loc[mask, "dosage_frequency_in_hours"].iloc[0]
+    dosage_frequency = int(medsdf.loc[mask, "dosage_frequency_in_hours"].iloc[0])
     medsdf.loc[mask, "quantity_on_hand"] = current_qty - dose_size
-    medsdf.loc[mask, "quantity_needed"] = current_needed_qty - dose_size
+    medsdf.loc[mask, "quantity_needed"] = max(0, current_needed_qty - dose_size)
     medsdf.loc[mask, "next_intake_time"] = set_new_intake_time(dosage_frequency)
     save_meds(medsdf)
-    return rdf
+    return rdf, "Logged successfully."
 
 def add_new_intake_record(dataframe,new_record):
     df = pd.concat([dataframe,new_record], ignore_index=True)
