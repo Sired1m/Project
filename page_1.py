@@ -31,12 +31,12 @@ def log_dose(med_id):
     st.rerun()
 
 
-# Confirmation from the previous run, if any
+
 if "last_logged" in st.session_state:
     info = st.session_state.pop("last_logged")
     st.success(f"Logged {info['name']}. Next dose due at {info['next_time']}")
 
-# ---- Scheduled meds ----
+
 if today_meds.empty:
     st.info("Nothing scheduled in the next 24 hours.")
 else:
@@ -49,7 +49,7 @@ else:
     display_df["next_intake_time"] = display_df["next_intake_time"].dt.strftime("%I:%M %p")
     st.table(display_df)
 
-# ---- Missed meds ----
+
 if not missed_meds.empty:
     missed_labels = make_labels(missed_meds)
     missed_id = st.selectbox("Missed meds", list(missed_labels), format_func=missed_labels.get)

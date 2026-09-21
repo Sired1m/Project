@@ -44,8 +44,6 @@ def list_to_string(lst, separator=', '):
 
 def search_by_ingredient(data_frame,ingredient):
     df = data_frame[data_frame.active_ingredients.str.contains(ingredient,case=False)]
-    if check_overdose(df):
-        st.warning(f"You might have a risk of overdose", icon="⚠️")
 
     return df
 
