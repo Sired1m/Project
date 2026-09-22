@@ -4,11 +4,14 @@ import datetime
 import streamlit as st
 import module
 
+tips = module.load_health_tips()
+random_tip = tips.sample(n=1)
 
 meds = module.load_meds()
 today_meds = module.exclude_expired_list(module.schedule_builder(meds))
 missed_meds = module.exclude_expired_list(module.list_not_taken_meds(meds))
 
+st.write(str(random_tip["Tips"].iloc[0]))
 
 def make_labels(df):
     times = df["next_intake_time"].dt.strftime("%Y-%m-%d %H:%M")

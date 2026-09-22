@@ -1,0 +1,6 @@
+med_id,medication_name,active_ingredients,dosage_frequency_in_hours,Usage_and_Safety_Instructions,Urgency,category,quantity_on_hand,expiration_date,compliance_rating,pills_per_dose,days,next_intake_time,quantity_needed,start_date,end_date
+4,NyQuil,"Acetaminophen, Dextromethorphan",8,Avoid alcohol,Medium,OTC,8,2026-10-05,3,2,10,2026-09-23 00:55:03.552165,10,2026-09-17 21:55:03.552165,2026-09-27 21:55:03.552165
+5,Amoxicillin,Amoxicillin,8,Complete full course,High,Prescription,6,2026-11-20,4,1,10,2026-09-23 03:55:03.552165,10,2026-09-17 21:55:03.552165,2026-09-27 21:55:03.552165
+7,Multivitamin,Mixed vitamins,12,Take with food,Medium,Supplement,2,2027-03-15,3,2,10,2026-09-22 23:55:03.552165,10,2026-09-17 21:55:03.552165,2026-09-27 21:55:03.552165
+9,Lisinopril,Lisinopril,24,Take same time daily,High,Prescription,10,2027-06-01,5,1,30,2026-09-22 16:55:03.552165,30,2026-09-17 21:55:03.552165,2026-10-17 21:55:03.552165
+10,Omeprazole,Omeprazole,24,Take before breakfast,Medium,Prescription,0,2027-03-15,3,1,10,2026-09-22 19:55:03.552165,10,2026-09-17 21:55:03.552165,2026-09-27 21:55:03.552165

@@ -10,6 +10,7 @@ pages = [
     st.Page("page_3.py", title="Add Medication"),
     st.Page("page_4.py", title="Search by Ingredient"),
     st.Page("page_5.py", title="Refill Request List"),
+    st.Page("page_6.py", title="Interaction & Safety Advisor"),
 ]
 
 pg = st.navigation(pages, position="sidebar")

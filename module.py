@@ -3,6 +3,9 @@ import numpy as np
 import datetime
 import streamlit as st
 import requests
+import json
+import os
+from dotenv import load_dotenv
 
 def add_new_meds_record(data_frame, new_record):
     df = pd.concat([data_frame,new_record], ignore_index=True)
@@ -164,19 +167,71 @@ def exclude_expired_list(dataframe):
     return dataframe[pd.to_datetime(dataframe["expiration_date"], errors="coerce") >= now]
 
 def fetch_med_ingrediants(med_name):
-    resp1 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui.json?name={med_name}")
-    if resp1.status_code == 204:
-        return None
-    elif not resp1.text:
-        return None
-    elif not resp1.json().get("idGroup", {}).get("rxnormId"):
-        return None
+    try:
+        resp1 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui.json?name={med_name}")
+        if resp1.status_code == 204:
+            return []
+        elif not resp1.text:
+            return []
+        elif not resp1.json().get("idGroup", {}).get("rxnormId"):
+            return []
 
-    med_id=resp1.json()["idGroup"]["rxnormId"][0]
-    resp2 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui/{med_id}/related.json?tty=IN")
-    data = resp2.json()
-    ingredients = []
-    for group in data.get('relatedGroup', {}).get('conceptGroup', []):
-        for concept in group.get('conceptProperties', []):
-            ingredients.append(concept['name'])
-    return ingredients
+        med_id=resp1.json()["idGroup"]["rxnormId"][0]
+        resp2 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui/{med_id}/related.json?tty=IN")
+        data = resp2.json()
+        ingredients = []
+        for group in data.get('relatedGroup', {}).get('conceptGroup', []):
+            for concept in group.get('conceptProperties', []):
+                ingredients.append(concept['name'])
+        return ingredients
+    except requests.RequestException:
+        return []
+
+
+REFILL_LIST_COLUMNS = ["med_id","medication_name","active_ingredients","dosage_frequency_in_hours","Usage_and_Safety_Instructions","Urgency","category","quantity_on_hand","expiration_date","compliance_rating","pills_per_dose","days","next_intake_time","quantity_needed","start_date","end_date"]
+
+def load_refill_list():
+    try:
+        df = pd.read_csv("refill_request_list.csv")
+        df["next_intake_time"] = pd.to_datetime(df["next_intake_time"], format="mixed")
+        df["expiration_date"] = pd.to_datetime(df["expiration_date"], format="mixed")
+        return df
+    except FileNotFoundError:
+        return pd.DataFrame(columns=REFILL_LIST_COLUMNS)
+
+def save_refill_list(dataframe):
+    dataframe.to_csv("refill_request_list.csv", index=False)
+
+
+def build_prompt(dataframe):
+    meds_text = ""
+    for i, row in dataframe.iterrows():
+        meds_text += f"- {row['medication_name']}: {row['active_ingredients']}\n"
+
+    return "Here is a list of medications:\n" + meds_text + "\nList any possible drug interactions and explain any medical terms in simple language."
+
+load_dotenv()
+API_KEY = os.getenv("API_KEY")
+
+def ask_ai(prompt):
+    response = requests.post(
+  url="https://openrouter.ai/api/v1/chat/completions",
+  headers={
+    "Authorization": f"Bearer {API_KEY}",
+    "Content-Type": "application/json",
+  },
+  data=json.dumps({
+    "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "messages": [
+        {
+          "role": "user",
+          "content": prompt
+        }
+      ],
+    "reasoning": {"enabled": True}
+  })
+)
+
+    
+    data = response.json()
+    return data["choices"][0]["message"]["content"]

@@ -3,26 +3,13 @@ import numpy as np
 import datetime
 import streamlit as st
 import module
-import datetime
-st.title("Add med")
-'''
-med_id,
-medication_name,
-active_ingredients,
-dosage_frequency_in_hours,
-Usage_and_Safety_Instructions,
-Urgency,
-category,
-quantity_on_hand,
-expiration_date,
-compliance_rating,
-pills_per_dose,
-days,
-next_intake_time,
-quantity_needed,
-start_date,
-end_date
-'''
+
+df=module.load_meds()
+
+st.title("Add Medication")
+
+if "add_success" in st.session_state:
+    st.success(st.session_state.pop("add_success"))
 
 med_name = st.text_input("med name")
 active_ingredients = []
@@ -32,26 +19,82 @@ if "fetched_ingredients" not in st.session_state:
 
 if st.button("Add ingrediants"):
     active_ingredients = module.fetch_med_ingrediants(med_name)
-    st.session_state["fetched_ingredients"] = active_ingredients
+    if not active_ingredients:
+        st.error("Could not find the ingredients for this medication.")
+        st.session_state["fetched_ingredients"] = []
+    else:
+        st.session_state["fetched_ingredients"] = active_ingredients
+        st.success("Ingredients found!")
 
-options = st.multiselect("ingrediants", st.session_state["fetched_ingredients"],accept_new_options=True)
+with st.form("add_med_form", clear_on_submit=True):
 
-dosage_frequency_in_hours = st.number_input(
-    "Insert the dosage frequency in hours", value=1, placeholder="Type a number...", min_value=1, max_value=24,step=1)
+    options = st.multiselect(
+        "Ingredients",
+        st.session_state["fetched_ingredients"],
+        accept_new_options=True
+    )
 
-Usage_and_Safety_Instructions = st.text_input("Usage and Safety Instructions")
+    dosage_frequency_in_hours = st.number_input(
+        "Dosage frequency in hours",
+        min_value=1,
+        max_value=24,
+        value=1,
+        step=1
+    )
 
-category = st.selectbox("What category?",["Prescription", "OTC", "Supplement", "First Aid"])
+    Usage_and_Safety_Instructions = st.text_input(
+        "Usage and Safety Instructions"
+    )
 
-urgency = st.selectbox("What the urgency?",["High", "Mid", "Low"])
+    category = st.selectbox(
+        "Category",
+        ["Prescription", "OTC", "Supplement", "First Aid"]
+    )
 
-quantity_on_hand = st.number_input(
-    "Insert the quantity on hand", value=1, placeholder="Type a number...", min_value=1,step=1)
+    urgency = st.selectbox(
+        "Urgency",
+        ["High", "Mid", "Low"]
+    )
 
-expiration_date= st.date_input("When's the med expiration date", datetime.date.today(), min_value="today")
+    quantity_on_hand = st.number_input(
+        "Quantity on hand",
+        min_value=1,
+        value=1,
+        step=1
+    )
 
-pills_per_dose = st.number_input(
-    "Insert the number of pills per dose", value=1, placeholder="Type a number...", min_value=1,max_value=20,step=1)
+    expiration_date = st.date_input(
+        "Expiration date",
+        datetime.date.today(),
+        min_value=datetime.date.today()
+    )
 
-days = st.number_input(
-    "Insert the number of days you plan to take the med", value=1, placeholder="Type a number...", min_value=1,step=1)
+    pills_per_dose = st.number_input(
+        "Number of pills per dose",
+        min_value=1,
+        max_value=20,
+        value=1,
+        step=1
+    )
+
+    days = st.number_input(
+        "Number of days you plan to take the medication",
+        min_value=1,
+        value=1,
+        step=1
+    )
+
+    submitted = st.form_submit_button("Add Medication")
+
+    if submitted:
+        if not med_name.strip():
+            st.error("Please enter a medication name.")
+
+        elif not options:
+            st.error("Please select at least one ingredient.")
+
+        else:
+            rdf = module.create_meds_record(df, med_name, options, dosage_frequency_in_hours, Usage_and_Safety_Instructions, urgency, category, quantity_on_hand, expiration_date, pills_per_dose, days)
+            module.add_new_meds_record(df, rdf)
+            st.success(f"{med_name} added successfully!")
+            st.session_state["fetched_ingredients"] = []
