@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import datetime
 import streamlit as st
+import requests
 
 def add_new_meds_record(data_frame, new_record):
     df = pd.concat([data_frame,new_record], ignore_index=True)
@@ -161,3 +162,21 @@ def list_expiered_list(dataframe):
 def exclude_expired_list(dataframe):
     now = pd.Timestamp.today().normalize()
     return dataframe[pd.to_datetime(dataframe["expiration_date"], errors="coerce") >= now]
+
+def fetch_med_ingrediants(med_name):
+    resp1 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui.json?name={med_name}")
+    if resp1.status_code == 204:
+        return None
+    elif not resp1.text:
+        return None
+    elif not resp1.json().get("idGroup", {}).get("rxnormId"):
+        return None
+
+    med_id=resp1.json()["idGroup"]["rxnormId"][0]
+    resp2 = requests.get(f"https://rxnav.nlm.nih.gov/REST/rxcui/{med_id}/related.json?tty=IN")
+    data = resp2.json()
+    ingredients = []
+    for group in data.get('relatedGroup', {}).get('conceptGroup', []):
+        for concept in group.get('conceptProperties', []):
+            ingredients.append(concept['name'])
+    return ingredients
