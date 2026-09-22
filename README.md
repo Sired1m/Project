@@ -10,3 +10,6 @@ A Streamlit app for tracking medications, logging doses, checking refills, and g
 - **Search by Ingredient** – search meds by active ingredient, flags possible duplicate/overdose risk.
 - **Refill Request List** – shows meds running low and lets you add them to a refill request list.
 - **Interaction & Safety Advisor** – sends your current active medications to an AI model (via OpenRouter) to summarize possible drug interactions and explain medical terms in plain language.
+
+[APP link](https://project-iaahjzs744ldqdoctt2xae.streamlit.app/)
+  
